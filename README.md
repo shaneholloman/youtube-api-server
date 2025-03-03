@@ -25,7 +25,7 @@ cd youtube-api-server
 
 2. Install the required dependencies:
 ```bash
-pip install fastapi uvicorn youtube_transcript_api
+pip install -r requirements.txt
 ```
 
 ## Running the Server
