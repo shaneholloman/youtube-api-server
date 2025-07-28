@@ -46,6 +46,7 @@ def get_webshare_config():
     return WebshareProxyConfig(
         proxy_username=username,
         proxy_password=password,
+        filter_ip_locations=["de", "us"],
     )
 
 WEBSHARE_PROXY_CONFIG = get_webshare_config()
