@@ -23,8 +23,8 @@ except Exception as e:
 
 try:
     from youtube_transcript_api import YouTubeTranscriptApi
-    from youtube_transcript_api.proxies import GenericProxyConfig
-    print(f"[{datetime.now()}] Successfully imported YouTubeTranscriptApi and GenericProxyConfig")
+    from youtube_transcript_api.proxies import WebshareProxyConfig
+    print(f"[{datetime.now()}] Successfully imported YouTubeTranscriptApi and WebshareProxyConfig")
 except ImportError:
     print(f"[{datetime.now()}] ERROR: Failed to import youtube_transcript_api")
     raise ImportError(
@@ -34,17 +34,19 @@ except ImportError:
 # Configure Webshare proxy to avoid IP blocking using environment variables
 def get_webshare_config():
     """Get Webshare proxy configuration from environment variables."""
-    proxy_url = os.getenv("WEBSHARE_PROXY")
+    username = os.getenv("WEBSHARE_PROXY_USERNAME")
+    password = os.getenv("WEBSHARE_PROXY_PASSWORD")
 
-    if not proxy_url:
+    if not username or not password:
         print(f"[{datetime.now()}] WARNING: Webshare proxy credentials not found in environment variables")
-        print(f"[{datetime.now()}] Set WEBSHARE_PROXY to enable proxy")
+        print(f"[{datetime.now()}] Set WEBSHARE_PROXY_USERNAME and WEBSHARE_PROXY_PASSWORD to enable proxy")
         return None
 
     print(f"[{datetime.now()}] Webshare proxy configuration loaded from environment variables")
-    return GenericProxyConfig(
-        http_url=proxy_url,
-        https_url=proxy_url
+    return WebshareProxyConfig(
+        proxy_username=username,
+        proxy_password=password,
+        filter_ip_locations=["de", "us"],
     )
 
 WEBSHARE_PROXY_CONFIG = get_webshare_config()
@@ -405,13 +407,14 @@ if __name__ == "__main__":
     print(f"[{datetime.now()}] Port: {port}")
 
     if WEBSHARE_PROXY_CONFIG:
-        proxy_url = os.getenv("WEBSHARE_PROXY", "unknown")
-        print(f"[{datetime.now()}] Proxy: Webshare enabled (URL: {proxy_url[:30]}...)")
+        username = os.getenv("WEBSHARE_PROXY_USERNAME", "unknown")
+        print(f"[{datetime.now()}] Proxy: Webshare enabled (username: {username})")
     else:
-        print(f"[{datetime.now()}] Proxy: Disabled - set WEBSHARE_PROXY to enable")
+        print(f"[{datetime.now()}] Proxy: Disabled - set WEBSHARE_PROXY_USERNAME and WEBSHARE_PROXY_PASSWORD to enable")
 
     print(f"[{datetime.now()}] Environment Variables:")
-    print(f"[{datetime.now()}]   - WEBSHARE_PROXY: {'Set' if os.getenv('WEBSHARE_PROXY') else 'Not Set'}")
+    print(f"[{datetime.now()}]   - WEBSHARE_PROXY_USERNAME: {'Set' if os.getenv('WEBSHARE_PROXY_USERNAME') else 'Not Set'}")
+    print(f"[{datetime.now()}]   - WEBSHARE_PROXY_PASSWORD: {'Set' if os.getenv('WEBSHARE_PROXY_PASSWORD') else 'Not Set'}")
     print(f"[{datetime.now()}] ========================================")
 
     uvicorn.run(app, host=host, port=port)

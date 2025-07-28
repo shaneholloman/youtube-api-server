@@ -12,7 +12,8 @@ def load_env_file():
     This function maintains compatibility with the existing main.py import.
     """
     required_vars = [
-        'WEBSHARE_PROXY'
+        'WEBSHARE_PROXY_USERNAME',
+        'WEBSHARE_PROXY_PASSWORD'
     ]
 
     optional_vars = [
