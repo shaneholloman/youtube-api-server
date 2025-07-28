@@ -176,20 +176,24 @@ class YouTubeTools:
         transcript_list = ytt_api.list(video_id)
         available_languages = [t.language_code for t in transcript_list]
 
-        # Determine which language to use
+        # Determine which language to use and fetch transcript
         if languages:
             # Try requested languages first
             for lang in languages:
                 if lang in available_languages:
-                    return ytt_api.fetch(video_id, languages=[lang]), available_languages
+                    fetched_transcript = ytt_api.fetch(video_id, languages=[lang])
+                    return fetched_transcript, available_languages
             # If none found, use first available
-            return ytt_api.fetch(video_id, languages=[available_languages[0]]), available_languages
+            fetched_transcript = ytt_api.fetch(video_id, languages=[available_languages[0]])
+            return fetched_transcript, available_languages
         else:
             # No languages specified, prefer English
             if 'en' in available_languages:
-                return ytt_api.fetch(video_id, languages=['en']), available_languages
+                fetched_transcript = ytt_api.fetch(video_id, languages=['en'])
+                return fetched_transcript, available_languages
             else:
-                return ytt_api.fetch(video_id, languages=[available_languages[0]]), available_languages
+                fetched_transcript = ytt_api.fetch(video_id, languages=[available_languages[0]])
+                return fetched_transcript, available_languages
 
     @staticmethod
     async def get_video_captions(url: str, languages: Optional[List[str]] = None) -> str:
@@ -401,14 +405,13 @@ if __name__ == "__main__":
     print(f"[{datetime.now()}] Port: {port}")
 
     if WEBSHARE_PROXY_CONFIG:
-        username = os.getenv("WEBSHARE_PROXY_USERNAME", "unknown")
-        print(f"[{datetime.now()}] Proxy: Webshare enabled (username: {username})")
+        proxy_url = os.getenv("WEBSHARE_PROXY", "unknown")
+        print(f"[{datetime.now()}] Proxy: Webshare enabled (URL: {proxy_url[:30]}...)")
     else:
-        print(f"[{datetime.now()}] Proxy: Disabled - set WEBSHARE_PROXY_USERNAME and WEBSHARE_PROXY_PASSWORD to enable")
+        print(f"[{datetime.now()}] Proxy: Disabled - set WEBSHARE_PROXY to enable")
 
     print(f"[{datetime.now()}] Environment Variables:")
-    print(f"[{datetime.now()}]   - WEBSHARE_PROXY_USERNAME: {'Set' if os.getenv('WEBSHARE_PROXY_USERNAME') else 'Not Set'}")
-    print(f"[{datetime.now()}]   - WEBSHARE_PROXY_PASSWORD: {'Set' if os.getenv('WEBSHARE_PROXY_PASSWORD') else 'Not Set'}")
+    print(f"[{datetime.now()}]   - WEBSHARE_PROXY: {'Set' if os.getenv('WEBSHARE_PROXY') else 'Not Set'}")
     print(f"[{datetime.now()}] ========================================")
 
     uvicorn.run(app, host=host, port=port)
