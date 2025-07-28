@@ -23,8 +23,8 @@ except Exception as e:
 
 try:
     from youtube_transcript_api import YouTubeTranscriptApi
-    from youtube_transcript_api.proxies import WebshareProxyConfig
-    print(f"[{datetime.now()}] Successfully imported YouTubeTranscriptApi and WebshareProxyConfig")
+    from youtube_transcript_api.proxies import GenericProxyConfig
+    print(f"[{datetime.now()}] Successfully imported YouTubeTranscriptApi and GenericProxyConfig")
 except ImportError:
     print(f"[{datetime.now()}] ERROR: Failed to import youtube_transcript_api")
     raise ImportError(
@@ -34,21 +34,17 @@ except ImportError:
 # Configure Webshare proxy to avoid IP blocking using environment variables
 def get_webshare_config():
     """Get Webshare proxy configuration from environment variables."""
-    username = os.getenv("WEBSHARE_PROXY_USERNAME")
-    password = os.getenv("WEBSHARE_PROXY_PASSWORD")
+    proxy_url = os.getenv("WEBSHARE_PROXY")
 
-    if not username or not password:
+    if not proxy_url:
         print(f"[{datetime.now()}] WARNING: Webshare proxy credentials not found in environment variables")
-        print(f"[{datetime.now()}] Set WEBSHARE_PROXY_USERNAME and WEBSHARE_PROXY_PASSWORD to enable proxy")
+        print(f"[{datetime.now()}] Set WEBSHARE_PROXY to enable proxy")
         return None
 
     print(f"[{datetime.now()}] Webshare proxy configuration loaded from environment variables")
-    return WebshareProxyConfig(
-        proxy_username=username,
-        proxy_password=password,
-        domain_name="p.webshare.io",
-        proxy_port=80,
-        filter_ip_locations=["de", "us"],
+    return GenericProxyConfig(
+        http_url=proxy_url,
+        https_url=proxy_url
     )
 
 WEBSHARE_PROXY_CONFIG = get_webshare_config()
